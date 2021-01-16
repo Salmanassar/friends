@@ -1,16 +1,18 @@
 package com.ewirebrain.friends.controller;
 
 import com.ewirebrain.friends.model.Friend;
-import com.ewirebrain.friends.model.util.ErrorMessage;
+import com.ewirebrain.friends.model.util.FieldErrorMessage;
 import com.ewirebrain.friends.service.FriendService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.bind.ValidationException;
+import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
-import java.util.logging.ErrorManager;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
@@ -25,18 +27,22 @@ public class FriendController {
     }
 
     @PostMapping("/friend")
-    public Friend creat(@RequestBody Friend friend) throws ValidationException {
-        if (friend.getId() == 0 && isNotNull(friend))
-            return friendService.save(friend);
-        else throw new ValidationException("Friend can not be created");
+    public Friend creat(@Valid @RequestBody Friend friend) {
+        return friendService.save(friend);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    List<FieldErrorMessage> exceptionHandler(MethodArgumentNotValidException exception) {
+        List<FieldError> fieldErrors = exception.getBindingResult().getFieldErrors();
+        return fieldErrors.stream()
+                .map(fieldError -> new FieldErrorMessage(fieldError.getField(), fieldError.getDefaultMessage()))
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/friend")
-    public ResponseEntity<Friend> update(@RequestBody Friend friend) {
-        if (friendService.findById(friend.getId()).isPresent())
-            return new ResponseEntity(friendService.save(friend), HttpStatus.OK);
-        else
-            return new ResponseEntity(friend, HttpStatus.BAD_REQUEST);
+    public Friend update(@Valid @RequestBody Friend friend) {
+        return friendService.save(friend);
     }
 
     @DeleteMapping("friend/{id}")
@@ -71,5 +77,4 @@ public class FriendController {
         return Stream.of(friend.getFirstName(), friend.getLastName())
                 .noneMatch(String::isEmpty);
     }
-
 }

@@ -1,12 +1,11 @@
 package com.ewirebrain.friends.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
 @Data
@@ -19,15 +18,12 @@ public class Friend {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @JsonProperty("first-name")
+    @NotBlank
     private String firstName;
 
-    @JsonProperty("last-name")
+    @NotBlank
     private String lastName;
-
     private int age;
-
-    @JsonIgnore
     private boolean marred;
 
     @OneToMany(cascade = CascadeType.ALL)
