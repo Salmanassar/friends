@@ -1,14 +1,13 @@
 package com.ewirebrain.friends.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,4 +27,9 @@ public class Friend {
 
     @OneToMany(cascade = CascadeType.ALL)
     List<Address> address;
+
+    public Friend(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
 }
